@@ -100,22 +100,9 @@ def joinFactors(factors):
                     "Input factors: \n" +
                     "\n".join(map(str, factors)))
 
-
-        f = factors[1]
-
-        print("Asingment Dict", f.getAllPossibleAssignmentDicts())
-        assignmentDict = f.getAllPossibleAssignmentDicts()
-        print("assingment dicts 0", assignmentDict[0])
-        print("Prob", f.getProbability(assignmentDict[0]))
-        print("Unconditional variables", f.unconditionedVariables())
-        print("Conditonal Variables", f.conditionedVariables())
-        print("Variable Domains", f.variableDomainsDict())
-        print("\n\n")
-
-        print("looping through factors")
         unconditionalSet = set()
         conditionalSet = set() 
-        
+
         for factor in factors:
             for u in factor.unconditionedVariables(): 
                 unconditionalSet.add(u)
@@ -124,28 +111,18 @@ def joinFactors(factors):
                 if c not in unconditionalSet:
                     conditionalSet.add(c)
 
-
         newFactor = Factor(unconditionalSet, conditionalSet, factors[0].variableDomainsDict())
         for assignment in newFactor.getAllPossibleAssignmentDicts():
             pr = 1.0
             for factor in factors:
                 pr *= factor.getProbability(assignment)
-                
+                print(assignment)
+                print(factor.getProbability(assignment))
+                print(factor.getAllPossibleAssignmentDicts())
             newFactor.setProbability(assignment, pr)
-            
-                
-        
-        print("new factor\n", newFactor)
-
-
-
-        
-
         
         return newFactor
 
-
-    "*** YOUR CODE HERE ***"
     
 
 
@@ -195,7 +172,29 @@ def eliminateWithCallTracking(callTrackingList=None):
                     "unconditionedVariables: " + str(factor.unconditionedVariables()))
 
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        unconditionalSet = factor.unconditionedVariables()
+        conditionalSet = factor.conditionedVariables()
+        unconditionalSet.remove(eliminationVariable)
+
+        print("facotor variable domains", factor.getAllPossibleAssignmentDicts())
+
+        newFactor = Factor(unconditionalSet, conditionalSet, factor.variableDomainsDict())
+        for assignment in newFactor.getAllPossibleAssignmentDicts():
+            pr = 0
+            print("Assingment-", assignment)
+                
+            for oldAssignment in factor.getAllPossibleAssignmentDicts():
+                found = True
+                for a in assignment:
+                    if oldAssignment[a] != assignment[a]:
+                        found = False
+                        break
+                if found:
+                    pr += factor.getProbability(oldAssignment)                    
+
+            newFactor.setProbability(assignment, pr)
+        return newFactor
+
 
     return eliminate
 
