@@ -101,8 +101,52 @@ def joinFactors(factors):
                     "\n".join(map(str, factors)))
 
 
+        f = factors[1]
+
+        print("Asingment Dict", f.getAllPossibleAssignmentDicts())
+        assignmentDict = f.getAllPossibleAssignmentDicts()
+        print("assingment dicts 0", assignmentDict[0])
+        print("Prob", f.getProbability(assignmentDict[0]))
+        print("Unconditional variables", f.unconditionedVariables())
+        print("Conditonal Variables", f.conditionedVariables())
+        print("Variable Domains", f.variableDomainsDict())
+        print("\n\n")
+
+        print("looping through factors")
+        unconditionalSet = set()
+        conditionalSet = set() 
+        
+        for factor in factors:
+            for u in factor.unconditionedVariables(): 
+                unconditionalSet.add(u)
+        for factor in factors: 
+            for c in factor.conditionedVariables():
+                if c not in unconditionalSet:
+                    conditionalSet.add(c)
+
+
+        newFactor = Factor(unconditionalSet, conditionalSet, factors[0].variableDomainsDict())
+        for assignment in newFactor.getAllPossibleAssignmentDicts():
+            pr = 1.0
+            for factor in factors:
+                pr *= factor.getProbability(assignment)
+                
+            newFactor.setProbability(assignment, pr)
+            
+                
+        
+        print("new factor\n", newFactor)
+
+
+
+        
+
+        
+        return newFactor
+
+
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    
 
 
 def eliminateWithCallTracking(callTrackingList=None):
