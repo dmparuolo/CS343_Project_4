@@ -214,8 +214,6 @@ def fillObsCPT(bayesNet, gameState):
     bottomLeftPos, topLeftPos, bottomRightPos, topRightPos = gameState.getPossibleHouses()
 
     "*** YOUR CODE HERE ***"
-    
-    print("made it to fillObsCPT")
     i = 1
     for housePos in [bottomLeftPos, topLeftPos, bottomRightPos, topRightPos]:
         for wall in gameState.getHouseWalls(housePos):
@@ -297,8 +295,15 @@ def getMostLikelyFoodHousePosition(evidence, bayesNet, eliminationOrder):
     (This should be a very short method.)
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    factor = inference.inferenceByVariableElimination(bayesNet, FOOD_HOUSE_VAR, evidence, eliminationOrder)
+    max_prob = -1
+    max_assignment = None
+    for assignment in factor.getAllPossibleAssignmentDicts():
+        if factor.getProbability(assignment) > max_prob:
+            max_prob = factor.getProbability(assignment)
+            max_assignment = assignment
 
+    return max_assignment
 
 class BayesAgent(game.Agent):
 
