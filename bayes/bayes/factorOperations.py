@@ -100,28 +100,25 @@ def joinFactors(factors):
                     "Input factors: \n" +
                     "\n".join(map(str, factors)))
 
-        unconditionalSet = set()
-        conditionalSet = set() 
+    unconditionalSet = set()
+    conditionalSet = set() 
 
+    for factor in factors:
+        for u in factor.unconditionedVariables(): 
+            unconditionalSet.add(u)
+    for factor in factors: 
+        for c in factor.conditionedVariables():
+            if c not in unconditionalSet:
+                conditionalSet.add(c)
+    
+    newFactor = Factor(unconditionalSet, conditionalSet, factors[0].variableDomainsDict())
+    for assignment in newFactor.getAllPossibleAssignmentDicts():
+        pr = 1.0
         for factor in factors:
-            for u in factor.unconditionedVariables(): 
-                unconditionalSet.add(u)
-        for factor in factors: 
-            for c in factor.conditionedVariables():
-                if c not in unconditionalSet:
-                    conditionalSet.add(c)
-
-        newFactor = Factor(unconditionalSet, conditionalSet, factors[0].variableDomainsDict())
-        for assignment in newFactor.getAllPossibleAssignmentDicts():
-            pr = 1.0
-            for factor in factors:
-                pr *= factor.getProbability(assignment)
-                print(assignment)
-                print(factor.getProbability(assignment))
-                print(factor.getAllPossibleAssignmentDicts())
-            newFactor.setProbability(assignment, pr)
-        
-        return newFactor
+            pr *= factor.getProbability(assignment)
+        newFactor.setProbability(assignment, pr)
+    
+    return newFactor
 
     
 
@@ -176,12 +173,9 @@ def eliminateWithCallTracking(callTrackingList=None):
         conditionalSet = factor.conditionedVariables()
         unconditionalSet.remove(eliminationVariable)
 
-        print("facotor variable domains", factor.getAllPossibleAssignmentDicts())
-
         newFactor = Factor(unconditionalSet, conditionalSet, factor.variableDomainsDict())
         for assignment in newFactor.getAllPossibleAssignmentDicts():
             pr = 0
-            print("Assingment-", assignment)
                 
             for oldAssignment in factor.getAllPossibleAssignmentDicts():
                 found = True
