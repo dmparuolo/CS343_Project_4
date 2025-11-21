@@ -404,8 +404,21 @@ class VPIAgent(BayesAgent):
         rightExpectedValue = 0
 
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        houseLeftProbability = 0
+        houseRightProbability = 0
 
+        factor = inference.inferenceByVariableElimination(self.bayesNet, HOUSE_VARS, evidence, eliminationOrder)
+        for assignment in factor.getAllPossibleAssignmentDicts():
+            if assignment[FOOD_HOUSE_VAR] == TOP_LEFT_VAL and assignment[GHOST_HOUSE_VAR] == TOP_RIGHT_VAL:
+                # add left expected value
+                houseLeftProbability = factor.getProbability(assignment)
+            elif assignment[FOOD_HOUSE_VAR] == TOP_RIGHT_VAL and assignment[GHOST_HOUSE_VAR] == TOP_LEFT_VAL:
+                # add right expected value
+                houseRightProbability = factor.getProbability(assignment)
+
+        
+        leftExpectedValue = houseLeftProbability * WON_GAME_REWARD + (1-houseLeftProbability) * GHOST_COLLISION_REWARD
+        rightExpectedValue = houseRightProbability * WON_GAME_REWARD + (1-houseRightProbability) * GHOST_COLLISION_REWARD
         return leftExpectedValue, rightExpectedValue
 
     def getExplorationProbsAndOutcomes(self, evidence):
@@ -467,12 +480,17 @@ class VPIAgent(BayesAgent):
         determine the expected value of acting with this extra evidence.
         """
 
-        expectedValue = 0
+        #expectedValue = 0
 
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        return sum([probability * max(self.computeEnterValues(explorationEvidence, enterEliminationOrder)) for probability, explorationEvidence in self.getExplorationProbsAndOutcomes(evidence)])
 
-        return expectedValue
+        
+        # pando = self.getExplorationProbsAndOutcomes(evidence)
+        # for (probability, explorationEvidence) in pando:
+        #     expectedValue += probability * max(self.computeEnterValues(explorationEvidence, enterEliminationOrder))
+
+        #return expectedValue
 
     def getAction(self, gameState):
 
